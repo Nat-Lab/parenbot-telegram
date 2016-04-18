@@ -11,3 +11,5 @@ A telegram bot that hates unmatched parentheses.
 ## Acknowledgement
 
 get this idea from [shouya/parenbot](https://github.com/shouya/parenbot).
+
+and based on [topkecleon/telegram-bot-bash](https://github.com/topkecleon/telegram-bot-bash).
