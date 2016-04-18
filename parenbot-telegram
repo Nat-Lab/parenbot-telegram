@@ -1,0 +1,60 @@
+#!/bin/bash
+
+TOKEN=''
+URL='https://api.telegram.org/bot'$TOKEN
+
+MSG_URL=$URL'/sendMessage'
+UPD_URL=$URL'/getUpdates?offset='
+
+OFFSET=0
+declare -A USER MESSAGE
+
+send_message() {
+        local chat="$1"
+        res=$(curl -s "$MSG_URL" -F "chat_id=$chat" -F "text=$2")
+}
+
+process_client() {
+	str="$MESSAGE"
+	IFS=$'\n'
+	for pair in $(cat map)
+	do
+		left=$(echo $pair | awk -F" " '{print $1}')
+		right=$(echo $pair | awk -F" " '{print $2}')
+		count_left="$(grep -o "$left" <<< "$str" | wc -l)"
+		count_right="$(grep -o "$right" <<< "$str" | wc -l)"
+        	[[ $count_left -gt $count_right ]] && {
+                	let times=$count_left-$count_right
+                	for i in $(seq 1 $times)
+                	do
+        	                to_complete="$to_complete$right"
+        	        done
+        	}
+	done
+
+	[[ ! -z $to_complete ]] && send_message "${USER[ID]}" "$to_complete ○(￣□￣○)"
+}
+
+while true; do {
+
+        res=$(curl -s $UPD_URL$OFFSET | ./JSON.sh -s)
+
+        # Target
+        USER[ID]=$(echo "$res" | egrep '\["result",0,"message","chat","id"\]' | cut -f 2)
+
+        # More info
+        [[ 0 -gt ${USER[ID]} ]] && sender=$(echo "$res" | grep '"result",0,"message","from","id"' | awk -F" " '{print $2}') && sender_fname=$(echo -e "$res" | grep '"result",0,"message","from","first_name"' | cut -f2 | cut -d '"' -f2 )
+
+        # Offset
+        OFFSET=$(echo "$res" | egrep '\["result",0,"update_id"\]' | cut -f 2)
+        # Message
+        MESSAGE=$(echo -e "$res" | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2 | sed -e "s/$BOT_NAME //g; s/$BOT_NAME//g;")
+
+        OFFSET=$((OFFSET+1))
+
+        if [ $OFFSET != 1 ]; then
+                process_client&
+
+        fi
+
+}; done
