@@ -16,23 +16,25 @@ while true; do {
                 IFS=$'\n'
                 for pair in $(cat map)
                 do
-                        left=$(echo $pair | awk -F" " '{print $1}')
-                        right=$(echo $pair | awk -F" " '{print $2}')
-                        [[ ! -z $(echo "$str" | grep "$left" ) ]] && {
-                                count_left="$(grep -o "$left" <<< "$MESSAGE" | wc -l)"
-                                count_right="$(grep -o "$right" <<< "$MESSAGE" | wc -l)"
-                                [[ $count_left -gt $count_right ]] && {
-                                        let times=$count_left-$count_right
-                                        for i in $(seq 1 $times)
-                                        do
-                                                to_complete="$to_complete$right"
-                                        done
-                                }
-                        }
+			{
+                        	left=$(echo $pair | awk -F" " '{print $1}')
+                       		right=$(echo $pair | awk -F" " '{print $2}')
+                        	[[ ! -z $(echo "$str" | grep "$left" ) ]] && {
+                        	        count_left="$(grep -o "$left" <<< "$MESSAGE" | wc -l)"
+                        	        count_right="$(grep -o "$right" <<< "$MESSAGE" | wc -l)"
+                        	        [[ $count_left -gt $count_right ]] && {
+                        	                let times=$count_left-$count_right
+                        	                for i in $(seq 1 $times)
+                        	                do
+                        	                        to_complete="$to_complete$right"
+                        	                done
+                        	        }
+                        	}
+			} &
                 done
                 to_complete=$(echo "$to_complete" | tr -d '\\')
 		to_send="$to_complete ○(￣□￣○)"
-		[[ ! -z $to_complete ]] && res=$(curl -s "$MSG_URL" -F "chat_id=$USER" -F "text=$to_send")
+		[[ ! -z $to_complete ]] && curl -s "$MSG_URL" -F "chat_id=$USER" -F "text=$to_send" &
 		unset to_complete
 	}
 }; done
