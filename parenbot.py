@@ -33,10 +33,10 @@ def balance(bot, update):
 			right_c=msg.count(right)
 			num=left_c-right_c
 			complete=complete + str_make (right, num)
-	send=complete + " ○(￣□￣○)"
-	del complete
-	bot.sendMessage(update.message.chat_id, text=send)
-
+	if complete:
+		send=complete + " ○(￣□￣○)"
+		del complete
+		bot.sendMessage(update.message.chat_id, text=send)
 
 def main():
 	updater = Updater(TOKEN)
