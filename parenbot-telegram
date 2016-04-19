@@ -18,18 +18,15 @@ while true; do {
                 do
                        	left=$(echo $pair | awk -F" " '{print $1}')
                        	right=$(echo $pair | awk -F" " '{print $2}')
-			echo "$MESSAGE" | grep "$left"
                        	[[ ! -z $(echo "$MESSAGE" | grep "$left" ) ]] && {
                        	        count_left="$(grep -o "$left" <<< "$MESSAGE" | wc -l)"
                        	        count_right="$(grep -o "$right" <<< "$MESSAGE" | wc -l)"
 				echo "count_left: $count_left count_right: $count_right"
                        	        [[ $count_left -gt $count_right ]] && {
                        	                let times=$count_left-$count_right
-					echo "times: $times"
                        	                for i in $(seq 1 $times)
                        	                do
                        	                        to_complete="$to_complete$right"
-						echo "to_complete: $to_complete"
                        	                done
                        	        }
                        	}
