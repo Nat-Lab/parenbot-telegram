@@ -21,16 +21,19 @@ process_client() {
 	do
 		left=$(echo $pair | awk -F" " '{print $1}')
 		right=$(echo $pair | awk -F" " '{print $2}')
-		count_left="$(grep -o "$left" <<< "$str" | wc -l)"
-		count_right="$(grep -o "$right" <<< "$str" | wc -l)"
-        	[[ $count_left -gt $count_right ]] && {
-                	let times=$count_left-$count_right
-                	for i in $(seq 1 $times)
-                	do
-        	                to_complete="$to_complete$right"
-        	        done
-        	}
+		[[ ! -z $(echo "$str" | grep "$left" ) ]] && {
+			count_left="$(grep -o "$left" <<< "$str" | wc -l)"
+			count_right="$(grep -o "$right" <<< "$str" | wc -l)"
+	        	[[ $count_left -gt $count_right ]] && {
+	                	let times=$count_left-$count_right
+	                	for i in $(seq 1 $times)
+	                	do
+	        	                to_complete="$to_complete$right"
+	        	        done
+	        	}
+		}
 	done
+	to_complete=$(echo "$to_complete" | tr -d '\\')
 
 	[[ ! -z $to_complete ]] && send_message "${USER[ID]}" "$to_complete ○(￣□￣○)"
 }
