@@ -12,29 +12,31 @@ while true; do {
         OFFSET=$(echo "$res" | egrep '\["result",0,"update_id"\]' | cut -f 2)
         MESSAGE=$(echo -e "$res" | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2 | sed -e "s/$BOT_NAME //g; s/$BOT_NAME//g;")
         OFFSET=$((OFFSET+1))
-	[[ ! $OFFSET == "1" ]] && {
+	[[ ! $OFFSET == "1" && ! -z $MESSAGE ]] && {
                 IFS=$'\n'
                 for pair in $(cat map)
                 do
-			{
-                        	left=$(echo $pair | awk -F" " '{print $1}')
-                       		right=$(echo $pair | awk -F" " '{print $2}')
-                        	[[ ! -z $(echo "$str" | grep "$left" ) ]] && {
-                        	        count_left="$(grep -o "$left" <<< "$MESSAGE" | wc -l)"
-                        	        count_right="$(grep -o "$right" <<< "$MESSAGE" | wc -l)"
-                        	        [[ $count_left -gt $count_right ]] && {
-                        	                let times=$count_left-$count_right
-                        	                for i in $(seq 1 $times)
-                        	                do
-                        	                        to_complete="$to_complete$right"
-                        	                done
-                        	        }
-                        	}
-			} &
+                       	left=$(echo $pair | awk -F" " '{print $1}')
+                       	right=$(echo $pair | awk -F" " '{print $2}')
+			echo "$MESSAGE" | grep "$left"
+                       	[[ ! -z $(echo "$MESSAGE" | grep "$left" ) ]] && {
+                       	        count_left="$(grep -o "$left" <<< "$MESSAGE" | wc -l)"
+                       	        count_right="$(grep -o "$right" <<< "$MESSAGE" | wc -l)"
+				echo "count_left: $count_left count_right: $count_right"
+                       	        [[ $count_left -gt $count_right ]] && {
+                       	                let times=$count_left-$count_right
+					echo "times: $times"
+                       	                for i in $(seq 1 $times)
+                       	                do
+                       	                        to_complete="$to_complete$right"
+						echo "to_complete: $to_complete"
+                       	                done
+                       	        }
+                       	}
                 done
                 to_complete=$(echo "$to_complete" | tr -d '\\')
 		to_send="$to_complete ○(￣□￣○)"
-		[[ ! -z $to_complete ]] && curl -s "$MSG_URL" -F "chat_id=$USER" -F "text=$to_send" &
+		[[ ! -z $to_complete ]] && curl -s "$MSG_URL" -F "chat_id=$USER" -F "text=$to_send" > /dev/null &
 		unset to_complete
 	}
 }; done
