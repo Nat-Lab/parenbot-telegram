@@ -8,8 +8,6 @@ TOKEN=""
 from telegram.ext import Updater
 import logging
 
-maps="(,)|（,）|<,>|[,]|{,}|［,］|｛,｝|⦅,⦆|〚,〛|⦃,⦄|“,”|‘,’|‹,›|«,»|「,」|〈,〉|《,》|【,】|〔,〕|⦗,⦘|『,』|〖,〗|〘,〙|｢,｣|⟦,⟧|⟨,⟩|⟪,⟫|⟮,⟯|⟬,⟭|⌈,⌉|⌊,⌋|⦇,⦈|⦉,⦊|❛,❜|❝,❞|❨,❩|❪,❫|❴,❵|❬,❭|❮,❯|❰,❱"
-
 logging.basicConfig(
         format='[%(levelname)s] %(asctime)s - %(message)s',
         level=logging.INFO)
@@ -29,10 +27,10 @@ def str_make (str_, length):
 	return str_ * length
 
 def balance(bot, update):
-	log (bot, update)
-	openbrckt = ('([{（［｛⦅〚⦃“‘‹«「〈《【〔⦗『〖〘｢⟦⟨⟪⟮⟬⌈⌊⦇⦉❛❝❨❪❴❬❮❰❲'
+	#log (bot, update)
+	openbrckt = ('<([{（［｛⦅〚⦃“‘‹«「〈《【〔⦗『〖〘｢⟦⟨⟪⟮⟬⌈⌊⦇⦉❛❝❨❪❴❬❮❰❲'
 		     '⏜⎴⏞〝︵⏠﹁﹃︹︻︗︿︽﹇︷〈⦑⧼﹙﹛﹝⁽₍⦋⦍⦏⁅⸢⸤⟅⦓⦕⸦⸨｟⧘⧚⸜⸌⸂⸄⸉᚛༺༼')
-	clozbrckt = (')]}）］｝⦆〛⦄”’›»」〉》】〕⦘』〗〙｣⟧⟩⟫⟯⟭⌉⌋⦈⦊❜❞❩❫❵❭❯❱❳'
+	clozbrckt = ('>)]}）］｝⦆〛⦄”’›»」〉》】〕⦘』〗〙｣⟧⟩⟫⟯⟭⌉⌋⦈⦊❜❞❩❫❵❭❯❱❳'
 		     '⏝⎵⏟〞︶⏡﹂﹄︺︼︘﹀︾﹈︸〉⦒⧽﹚﹜﹞⁾₎⦌⦎⦐⁆⸣⸥⟆⦔⦖⸧⸩｠⧙⧛⸝⸍⸃⸅⸊᚜༻༽')
 	stack = []
 	for ch in update.message.text:
