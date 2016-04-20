@@ -3,7 +3,7 @@
 #
 # A telegram bot that hates unmatched parentheses.
 
-TOKEN="165826431:AAG2e7Wzz3sKZ8xcIZOFrCbbjTWrEmyjNNQ"
+TOKEN=""
 
 from telegram.ext import Updater
 import logging
@@ -44,9 +44,9 @@ def balance(bot, update):
 		if index >= 0:
 			if stack and stack[-1] == index:
 				stack.pop()
-	closed = ''.join(reversed(tuple(map(clozbrckt.__getitem__, stack)))) + " ○(￣□￣○)"
+	closed = ''.join(reversed(tuple(map(clozbrckt.__getitem__, stack))))
 	if closed:
-		bot.sendMessage(update.message.chat_id, text=closed)
+		bot.sendMessage(update.message.chat_id, text=closed + " ○(￣□￣○)")
 
 def main():
 	updater = Updater(TOKEN)
