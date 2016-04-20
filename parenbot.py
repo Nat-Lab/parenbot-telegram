@@ -3,7 +3,7 @@
 #
 # A telegram bot that hates unmatched parentheses.
 
-TOKEN=""
+TOKEN="165826431:AAG2e7Wzz3sKZ8xcIZOFrCbbjTWrEmyjNNQ"
 
 from telegram.ext import Updater
 import logging
@@ -30,20 +30,23 @@ def str_make (str_, length):
 
 def balance(bot, update):
 	log (bot, update)
-	msg=update.message.text
-	complete=""
-	for pair in maps.split("|"):
-		left=pair.split(",")[0]
-		right=pair.split(",")[1]
-		if left in msg:
-			left_c=msg.count(left)
-			right_c=msg.count(right)
-			num=left_c-right_c
-			complete=complete + str_make (right, num)
-	if complete:
-		send=complete + " ○(￣□￣○)"
-		del complete
-		bot.sendMessage(update.message.chat_id, text=send)
+	openbrckt = ('([{（［｛⦅〚⦃“‘‹«「〈《【〔⦗『〖〘｢⟦⟨⟪⟮⟬⌈⌊⦇⦉❛❝❨❪❴❬❮❰❲'
+		     '⏜⎴⏞〝︵⏠﹁﹃︹︻︗︿︽﹇︷〈⦑⧼﹙﹛﹝⁽₍⦋⦍⦏⁅⸢⸤⟅⦓⦕⸦⸨｟⧘⧚⸜⸌⸂⸄⸉᚛༺༼')
+	clozbrckt = (')]}）］｝⦆〛⦄”’›»」〉》】〕⦘』〗〙｣⟧⟩⟫⟯⟭⌉⌋⦈⦊❜❞❩❫❵❭❯❱❳'
+		     '⏝⎵⏟〞︶⏡﹂﹄︺︼︘﹀︾﹈︸〉⦒⧽﹚﹜﹞⁾₎⦌⦎⦐⁆⸣⸥⟆⦔⦖⸧⸩｠⧙⧛⸝⸍⸃⸅⸊᚜༻༽')
+	stack = []
+	for ch in update.message.text:
+		index = openbrckt.find(ch)
+		if index >= 0:
+			stack.append(index)
+			continue
+		index = clozbrckt.find(ch)
+		if index >= 0:
+			if stack and stack[-1] == index:
+				stack.pop()
+	closed = ''.join(reversed(tuple(map(clozbrckt.__getitem__, stack)))) + " ○(￣□￣○)"
+	if closed:
+		bot.sendMessage(update.message.chat_id, text=closed)
 
 def main():
 	updater = Updater(TOKEN)
