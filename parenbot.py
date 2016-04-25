@@ -15,10 +15,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def log(bot, update):
+	c = update.message.chat
 	if "private" not in update.message.chat.type:
-		logger.info('<%s %s (%s@%s)> %s' % (update.message.chat.first_name, update.message.chat.last_name, update.message.chat.username, update.message.chat.title, update.message.text))
+		logger.info('<%s %s (%s@%s)> %s' % (c.first_name, c.last_name, c.username, c.title, c.text))
 	else:
-		logger.info('<%s %s (%s)> %s' % (update.message.chat.first_name, update.message.chat.last_name, update.message.chat.username, update.message.text))
+		logger.info('<%s %s (%s)> %s' % (c.first_name, c.last_name, c.username, c.text))
 
 def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -32,19 +33,20 @@ def balance(bot, update):
 		     '⏜⎴⏞〝︵⏠﹁﹃︹︻︗︿︽﹇︷〈⦑⧼﹙﹛﹝⁽₍⦋⦍⦏⁅⸢⸤⟅⦓⦕⸦⸨｟⧘⧚⸜⸌⸂⸄⸉᚛༺༼')
 	clozbrckt = ('>)]}）］｝⦆〛⦄”’›»」〉》】〕⦘』〗〙｣⟧⟩⟫⟯⟭⌉⌋⦈⦊❜❞❩❫❵❭❯❱❳'
 		     '⏝⎵⏟〞︶⏡﹂﹄︺︼︘﹀︾﹈︸〉⦒⧽﹚﹜﹞⁾₎⦌⦎⦐⁆⸣⸥⟆⦔⦖⸧⸩｠⧙⧛⸝⸍⸃⸅⸊᚜༻༽')
+	parenmap  = dict(zip(openbrckt,clozbrckt))
 	stack = []
+	bad = False
 	for ch in update.message.text:
-		index = openbrckt.find(ch)
-		if index >= 0:
-			stack.append(index)
-			continue
-		index = clozbrckt.find(ch)
-		if index >= 0:
-			if stack and stack[-1] == index:
+		if ch in parenmap:
+			stack.append(ch)
+		else if ch in parenmap.values():
+			if stack[-1] != parenmap[ch]:
+				bad = True
+			else:
 				stack.pop()
-	closed = ''.join(reversed(tuple(map(clozbrckt.__getitem__, stack))))
-	if closed:
-		bot.sendMessage(update.message.chat_id, text=closed + " ○(￣□￣○)")
+	close = ''.join(map(parenmap.__getitem__, reversed(stack)))
+	if close:
+		bot.sendMessage(update.message.chat_id, text=(("(╯°□°）╯ %s" if bad else "%s ○(￣□￣○)") % close))
 
 def main():
 	updater = Updater(TOKEN)
