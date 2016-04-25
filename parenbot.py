@@ -39,9 +39,9 @@ def balance(bot, update):
 	for ch in update.message.text:
 		if ch in parenmap:
 			stack.append(ch)
-		elif stack and ch in parenmap.values():
-			if stack[-1] != parenmap[ch]:
-				bad = True
+		elif ch in parenmap.values():
+			if not stack or stack[-1] != parenmap[ch]:
+					bad = True
 			else:
 				stack.pop()
 	close = ''.join(map(parenmap.__getitem__, reversed(stack)))
